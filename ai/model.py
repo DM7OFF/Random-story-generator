@@ -3,7 +3,7 @@ from transformers import pipeline
 # Charge un modèle de génération de texte local
 generator = pipeline(
     "text-generation",
-    model="gpt2-medium"
+    model="distilgpt2"
 )
 
 def generate_text(prompt, max_tokens=500):
