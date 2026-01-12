@@ -16,7 +16,7 @@ selected_name = st.selectbox("Choose a character", character_names_with_create)
 # --- SI L'UTILISATEUR VEUT CREER UN PERSONNAGE ---
 if selected_name == "➕ Create new character":
     # Modal pour créer un personnage
-    with st.modal("Create a new character"):
+    with st.expander("Create a new character"):
         st.header("New Character")
         new_name = st.text_input("Name")
         new_role = st.text_input("Role")
