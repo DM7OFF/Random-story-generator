@@ -1,5 +1,4 @@
 from ai.model import generate_text
-from ai.prompt import build_prompt  # si tu veux garder des prompts dynamiques
 
 def create_story(settings, character, max_tokens=400):
     prompt = f"""
