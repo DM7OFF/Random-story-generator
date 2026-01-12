@@ -5,30 +5,42 @@ import time
 
 st.title("AI Story Generator")
 
-# --- CHARGER PERSONNAGES EXISTANTS ---
+# Initialiser la variable session_state
+if "character_updated" not in st.session_state:
+    st.session_state["character_updated"] = False
+
+# Charger les personnages
 characters = load_characters()
+
+# Si un nouveau personnage a été ajouté, mettre à jour la liste
+if st.session_state["character_updated"]:
+    characters = load_characters()
+    st.session_state["character_updated"] = False
+
 character_names = [c["name"] for c in characters]
+character_names_with_create = character_names + ["➕ Create new character"]
+selected_name = st.selectbox("Choose a character", character_names_with_create)
+
 
 # Ajouter une option spéciale pour créer un nouveau personnage
 character_names_with_create = character_names + ["➕ Create new character"]
 selected_name = st.selectbox("Choose a character", character_names_with_create)
 
 # --- SI L'UTILISATEUR VEUT CREER UN PERSONNAGE ---
-if selected_name == "➕ Create new character":
-    # Modal pour créer un personnage
-    with st.expander("Create a new character"):
-        st.header("New Character")
-        new_name = st.text_input("Name")
-        new_role = st.text_input("Role")
-        new_traits = st.text_area("Personality traits")
-        
-        if st.button("Save character"):
-            if new_name and new_role and new_traits:
-                add_character(new_name, new_role, new_traits)
-                st.success(f"Character '{new_name}' added successfully!")
-                st.experimental_rerun()  # Recharger la page pour mettre à jour la liste
-            else:
-                st.warning("Please fill in all fields")
+with st.expander("➕ Create new character"):
+    st.header("New Character")
+    new_name = st.text_input("Name")
+    new_role = st.text_input("Role")
+    new_traits = st.text_area("Personality traits")
+    
+if st.button("Save character", key="save_new_character"):
+    if new_name and new_role and new_traits:
+            add_character(new_name, new_role, new_traits)
+            st.success(f"Character '{new_name}' added successfully!")
+            st.session_state["character_updated"] = True  # <-- indicateur pour recharger la liste
+    else:
+            st.warning("Please fill in all fields")
+
 
 # --- SINON ON CHOISIT UN PERSONNAGE EXISTANT ---
 elif characters:  # s'assurer qu'il y a au moins un personnage
