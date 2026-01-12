@@ -1,17 +1,14 @@
-def build_prompt(settings):
-    """
-    Construit un prompt structuré pour guider l'IA.
-    """
+def build_prompt(settings, character):
     return (
-        f"Write a short story.\n"
-        f"Genre: {settings['genre']}\n"
-        f"Tone: {settings['tone']}\n"
-        f"Structure:\n"
-        f"Act 1: Introduction\n"
-        f"Act 2: Conflict\n"
-        f"Act 3: Resolution with a twist\n"
+        f"Write a {settings['tone'].lower()} {settings['genre'].lower()} story.\n"
+        f"The story must strictly follow a three-act structure.\n\n"
+        f"Main character:\n"
+        f"Name: {character['name']}\n"
+        f"Role: {character['role']}\n"
+        f"Personality traits: {character['traits']}\n\n"
         f"Rules:\n"
-        f"- Keep the main character consistent\n"
-        f"- Max 600 words\n\n"
-        f"Story:\n"
+        f"- The main character must stay consistent\n"
+        f"- Do not rename the character\n"
+        f"- End with an unexpected twist\n\n"
+        f"Act 1:\n"
     )
