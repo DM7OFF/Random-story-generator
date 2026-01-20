@@ -74,7 +74,16 @@ if menu == "Create Character":
 st.subheader("Character Selection")
 character_names = [c["name"] for c in characters]
 selected_name = st.selectbox("Choose a character", character_names)
-character = next(c for c in characters if c["name"] == selected_name)
+if selected_name != "➕ Create new character":
+    character = next(c for c in characters if c["name"] == selected_name)
+else:
+    character = None  # ou crée un objet vide par défaut
+    
+if character is None:
+    st.warning("Please create a character first!")
+else:
+    # Génération de l'histoire ici
+
 
 # =========================
 # GENERATE STORY
