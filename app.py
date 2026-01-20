@@ -78,18 +78,16 @@ if selected_name != "➕ Create new character":
     character = next(c for c in characters if c["name"] == selected_name)
 else:
     character = None  # ou crée un objet vide par défaut
-    
-if character is None:
-    st.warning("Please create a character first!")
-else:
-    # Génération de l'histoire ici
-
 
 # =========================
 # GENERATE STORY
 # =========================
-if menu == "Generate Story":
-    st.header("Generate a New Story")
+if character is None:
+    st.warning("Please create a character first!")
+else:
+
+    if menu == "Generate Story":
+        st.header("Generate a New Story")
 
     # Settings
     length = st.selectbox("Story length", ["short", "medium", "long"])
