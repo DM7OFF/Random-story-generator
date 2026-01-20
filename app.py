@@ -110,7 +110,8 @@ if menu == "Generate Story":
                     break
 
             # Génération finale
-            final_story = generate_story(base_story, character, max_tokens=max_tokens)
+            final_story = generate_story(base_story["text"], character, max_tokens=max_tokens)
+
 
             # Stocker dans session_state
             st.session_state["generated_stories"].append(base_story["text"])
