@@ -59,16 +59,14 @@ if menu == "Create Character":
     new_traits = st.text_area("Personality traits")
     new_gender = st.radio("Gender", ["Male", "Female"])
     new_level = st.selectbox("Writing level", ["Primary", "Secondary", "College"])
-
-    if st.button("Save character"):
-        if new_name and new_role and new_traits:
-            add_character(new_name, new_role, new_traits, new_gender, new_level)
-            st.success(f"Character '{new_name}' added successfully!")
-            st.session_state["characters_updated"] = True
-            st.experimental_rerun()
-        else:
-            st.warning("Please fill in all fields")
-    st.stop()  # Stoppe le reste de l'app jusqu'à ce que l'utilisateur revienne
+if st.button("Save character"):
+    if new_name and new_role and new_traits:
+        add_character(new_name, new_role, new_traits, new_gender, new_level)
+        st.success(f"Character '{new_name}' added successfully!")
+        st.session_state["characters_updated"] = True
+        st.experimental_rerun()  # Relance l'app pour mettre à jour la liste des personnages
+    else:
+        st.warning("Please fill in all fields")
 
 # =========================
 # SELECT CHARACTER

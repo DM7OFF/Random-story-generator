@@ -64,25 +64,28 @@ Ce projet met en valeur **l’intégration IA + UI interactive + mémoire long t
 ```bash
 git clone https://github.com/votreusername/ai-story-generator.git
 cd ai-story-generator
-Installez les dépendances :
 
-bash
-Copier le code
+```
+
+2. Installez les dépendances :
+```bash
 pip install -r requirements.txt
-Lancez l’application :
-
-bash
-Copier le code
+```
+3. Lancez l’application :
+```bash
 streamlit run app.py
+```
 🎮 Utilisation
 1️⃣ Créer un personnage
+
 Cliquez sur “➕ Create new character”
 
 Remplissez le nom, rôle, traits, sexe et niveau d’écriture
 
-Cliquez sur Save character pour ajouter le personnage
+Cliquez sur Save character pour ajouter le personnage à la liste
 
 2️⃣ Générer une nouvelle histoire
+
 Sélectionnez un personnage existant
 
 Choisissez genre, thème, niveau et longueur
@@ -92,6 +95,7 @@ Cliquez sur Generate story
 L’histoire générée s’affiche avec spinner, tags et score de cohérence
 
 3️⃣ Continuer l’histoire
+
 Allez dans Continue Story
 
 Cliquez sur Continue story pour générer la suite
@@ -100,17 +104,17 @@ L’histoire précédente est mémorisée pour suivre l’évolution des personn
 
 📸 Aperçu de l’interface
 
-Nouvelle histoire avec sélection de personnage et longueur
+Nouvelle histoire : sélection de personnage et longueur
 
-
-Mode Continuer l’histoire avec mémoire long terme
+Mode Continue Story : mémoire long terme et cohérence des personnages
 
 💡 À propos du projet
+
 Ce projet démontre :
 
 L’intégration d’IA générative dans un produit interactif
 
-La gestion de mémoire long terme et évolution de personnages
+La gestion de mémoire long terme et l’évolution des personnages
 
 Une interface intuitive et responsive avec Streamlit
 
@@ -119,15 +123,14 @@ Optimisation de la génération de texte avec Mini-Transformer et contrôle du n
 UI riche avec sidebar et tags visuels
 
 🚀 Améliorations futures
+
 Personnages évolutifs selon les histoires générées
 
 Story branching → choix utilisateur influençant la suite
 
-Interface plus “book-like” et export PDF des histoires
+Interface “book-like” et export PDF des histoires
 
 📂 Structure du projet
-graphql
-Copier le code
 ai-story-generator/
 ├── app.py                      # Interface principale Streamlit
 ├── data/
@@ -146,13 +149,13 @@ ai-story-generator/
 │   └── transformer_model.py    # Mini-Transformer pour générer/continuer histoires
 ├── requirements.txt            # Dépendances
 └── README.md
-🔗 Liens
+
+🔗 Liens utiles
+
 Streamlit
 
 Hugging Face Transformers
 
 Auteur
-Dm7 – Portfolio personnel / Projet IA interactif
 
-yaml
-Copier le code
+Dm7 – Portfolio personnel / Projet IA interactif
