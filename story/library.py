@@ -1,46 +1,37 @@
 import json
-import os
+import random
+from pathlib import Path
 
-def load_stories(length):
-    """
-    Charge les stories d'une catégorie : 'short', 'medium', 'long'
-    """
+STORY_DIR = Path(__file__).parent.parent / "data" / "story_library"
+
+def load_stories_by_length(length):
+    """Charge toutes les histoires d'une longueur donnée"""
     file_map = {
-        "short": "data/story_library/short_story.json",
-        "medium": "data/story_library/medium_story.json",
-        "long": "data/story_library/long_story.json"
+        "short": STORY_DIR / "short_story.json",
+        "medium": STORY_DIR / "medium_story.json",
+        "long": STORY_DIR / "long_story.json",
     }
-
-    path = file_map[length]
-    if not os.path.exists(path):
+    file_path = file_map.get(length)
+    if not file_path.exists():
         return []
+    with open(file_path, "r", encoding="utf-8") as f:
+        return json.load(f)
 
-    with open(path, "r", encoding="utf-8") as f:
-        stories = json.load(f)
-    return stories
-
-def get_random_story(length=None, genre=None, theme=None, gender=None, level=None):
-    stories = []
-    if length:
-        stories = load_stories_by_length(length)
-    else:
-        for l in ["short", "medium", "long"]:
-            stories.extend(load_stories_by_length(l))
+def get_random_story(length, genre=None, theme=None, gender=None, level=None):
+    """Retourne une histoire aléatoire filtrée par genre, thème, gender et level"""
+    stories = load_stories_by_length(length)
     
-    # Filtrer
+    # Filtrer si des paramètres sont donnés
     if genre:
-        stories = [s for s in stories if s["genre"] == genre]
+        stories = [s for s in stories if s.get("genre") == genre]
     if theme:
-        stories = [s for s in stories if s["theme"] == theme]
+        stories = [s for s in stories if s.get("theme") == theme]
     if gender:
-        stories = [s for s in stories if s["gender"] == gender]
+        stories = [s for s in stories if s.get("gender") == gender]
     if level:
-        stories = [s for s in stories if s["level"] == level]
-    
-    # Fallback
-    if not stories:
-        for l in ["short", "medium", "long"]:
-            stories.extend(load_stories_by_length(l))
-    
-    return random.choice(stories)
+        stories = [s for s in stories if s.get("level") == level]
 
+    if not stories:
+        return {"text": "No story found for these settings."}
+
+    return random.choice(stories)
