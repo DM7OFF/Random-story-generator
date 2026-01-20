@@ -35,13 +35,12 @@ characters = load_characters()
 # =========================
 # INIT TRANSFORMER
 # =========================
-if "transformer_initialized" not in st.session_state:
-   all_stories = []
-for length in ["short", "medium", "long"]:
-    for s in load_stories(length):
-        all_stories.append(s["text"])
-    init_transformer(all_stories)
-    st.session_state["transformer_initialized"] = True
+if "all_stories" not in st.session_state:
+    st.session_state.all_stories = []
+    for length in ["short", "medium", "long"]:
+        for s in load_stories(length):
+            st.session_state.all_stories.append(s["text"])
+
 
 # =========================
 # NAVIGATION
