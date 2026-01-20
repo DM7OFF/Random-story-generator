@@ -2,12 +2,10 @@ import streamlit as st
 import time
 
 # ===== Imports projet =====
-
-from story.library import get_random_story
+from story.library import get_random_story, load_stories
 from story.characters import load_characters, add_character
 from story.generator import generate_story
 from ai.transformer_model import init_transformer
-from story.library import load_stories
 
 # =========================
 # CONFIG
@@ -27,20 +25,24 @@ if "characters_updated" not in st.session_state:
 if "last_story" not in st.session_state:
     st.session_state["last_story"] = ""
 
+if "transformer_initialized" not in st.session_state:
+    st.session_state["transformer_initialized"] = False
+
 # =========================
 # LOAD CHARACTERS
 # =========================
 characters = load_characters()
 
 # =========================
-# INIT TRANSFORMER
+# INIT TRANSFORMER (ONE-TIME)
 # =========================
-if "all_stories" not in st.session_state:
-    st.session_state.all_stories = []
+if not st.session_state["transformer_initialized"]:
+    all_stories = []
     for length in ["short", "medium", "long"]:
         for s in load_stories(length):
-            st.session_state.all_stories.append(s["text"])
-
+            all_stories.append(s["text"])
+    init_transformer(all_stories)
+    st.session_state["transformer_initialized"] = True
 
 # =========================
 # NAVIGATION
@@ -66,7 +68,7 @@ if menu == "Create Character":
             st.experimental_rerun()
         else:
             st.warning("Please fill in all fields")
-    st.stop()
+    st.stop()  # Stoppe le reste de l'app jusqu'à ce que l'utilisateur revienne
 
 # =========================
 # SELECT CHARACTER
@@ -74,22 +76,20 @@ if menu == "Create Character":
 st.subheader("Character Selection")
 character_names = [c["name"] for c in characters]
 selected_name = st.selectbox("Choose a character", character_names)
-if selected_name != "➕ Create new character":
-    character = next(c for c in characters if c["name"] == selected_name)
-else:
-    character = None  # ou crée un objet vide par défaut
 
-# =========================
-# GENERATE STORY
-# =========================
+# Assure que character existe
+character = next((c for c in characters if c["name"] == selected_name), None)
+
 if character is None:
     st.warning("Please create a character first!")
-else:
+    st.stop()
 
-    if menu == "Generate Story":
-        st.header("Generate a New Story")
+# =========================
+# STORY SETTINGS
+# =========================
+if menu == "Generate Story":
+    st.header("Generate a New Story")
 
-    # Settings
     length = st.selectbox("Story length", ["short", "medium", "long"])
     genre = st.selectbox("Genre", ["Sci-Fi", "Fantasy", "Horror"])
     theme = st.selectbox("Theme", ["Adventure", "Mystery", "Romance", "Thriller"])
@@ -101,6 +101,7 @@ else:
 
     if st.button("Generate story"):
         with st.spinner("Generating story..."):
+            # On essaie d'obtenir une story unique
             attempts = 0
             while True:
                 base_story = get_random_story(length, genre, theme, gender, level)
@@ -110,7 +111,10 @@ else:
                 if attempts > 10:
                     break
 
+            # Génération finale
             final_story = generate_story(base_story, character, max_tokens=max_tokens)
+
+            # Stocker dans session_state
             st.session_state["generated_stories"].append(base_story["text"])
             st.session_state["last_story"] = final_story
 
@@ -121,7 +125,7 @@ else:
 # =========================
 # CONTINUE STORY
 # =========================
-if menu == "Continue Story":
+elif menu == "Continue Story":
     st.header("Continue Your Last Story")
     if not st.session_state["last_story"]:
         st.info("No story available. Please generate a story first.")
@@ -129,6 +133,7 @@ if menu == "Continue Story":
         if st.button("Continue story"):
             with st.spinner("Continuing story..."):
                 continued = generate_story(st.session_state["last_story"], character, max_tokens=300)
+
             st.session_state["last_story"] = continued
             st.markdown(f"**Character:** {character['name']} | **Level:** {character['level']}")
             st.write(continued)
