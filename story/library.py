@@ -17,11 +17,13 @@ def load_stories_by_length(length):
     with open(file_path, "r", encoding="utf-8") as f:
         return json.load(f)
 
+# Alias pour compatibilité avec ton app.py
+load_stories = load_stories_by_length
+
 def get_random_story(length, genre=None, theme=None, gender=None, level=None):
     """Retourne une histoire aléatoire filtrée par genre, thème, gender et level"""
-    stories = load_stories_by_length(length)
-    
-    # Filtrer si des paramètres sont donnés
+    stories = load_stories(length)  # utilise l’alias
+    # Filtrage selon paramètres
     if genre:
         stories = [s for s in stories if s.get("genre") == genre]
     if theme:
