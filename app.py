@@ -7,6 +7,7 @@ from story.library import get_random_story
 from story.characters import load_characters, add_character
 from story.generator import generate_story
 from ai.transformer_model import init_transformer
+from story.library import load_stories
 
 # =========================
 # CONFIG
@@ -35,10 +36,10 @@ characters = load_characters()
 # INIT TRANSFORMER
 # =========================
 if "transformer_initialized" not in st.session_state:
-    all_stories = []
-    for length in ["short", "medium", "long"]:
-        for s in get_random_story.__globals__["load_stories"](length):
-            all_stories.append(s["text"])
+   all_stories = []
+for length in ["short", "medium", "long"]:
+    for s in load_stories(length):
+        all_stories.append(s["text"])
     init_transformer(all_stories)
     st.session_state["transformer_initialized"] = True
 

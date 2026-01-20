@@ -1,17 +1,23 @@
 import json
-import random
+import os
 
-def load_stories_by_length(length):
-    """Charge les histoires selon la longueur"""
-    filename_map = {
-        "short": "stories_short.json",
-        "medium": "stories_medium.json",
-        "long": "stories_long.json"
+def load_stories(length):
+    """
+    Charge les stories d'une catégorie : 'short', 'medium', 'long'
+    """
+    file_map = {
+        "short": "data/story_library/short_story.json",
+        "medium": "data/story_library/medium_story.json",
+        "long": "data/story_library/long_story.json"
     }
-    path = filename_map.get(length, "stories_short.json")
-    with open(path, "r") as f:
-        data = json.load(f)
-    return data["stories"]  # liste de dict avec text, genre, theme, gender
+
+    path = file_map[length]
+    if not os.path.exists(path):
+        return []
+
+    with open(path, "r", encoding="utf-8") as f:
+        stories = json.load(f)
+    return stories
 
 def get_random_story(length=None, genre=None, theme=None, gender=None, level=None):
     stories = []
