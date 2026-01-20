@@ -1,23 +1,24 @@
 import json
 import os
 
-FILE = "data/characters.json"
+CHARACTERS_FILE = "characters.json"
 
 def load_characters():
-    if not os.path.exists(FILE):
+    try:
+        with open(CHARACTERS_FILE, "r") as f:
+            return json.load(f)["characters"]
+    except:
         return []
-    with open(FILE, "r") as f:
-        return json.load(f)
 
-def save_characters(characters):
-    with open(FILE, "w") as f:
-        json.dump(characters, f, indent=2)
-
-def add_character(name, role, traits):
+def add_character(name, role, traits, gender, level):
     characters = load_characters()
-    characters.append({
+    new_char = {
         "name": name,
         "role": role,
-        "traits": traits
-    })
-    save_characters(characters)
+        "traits": traits,
+        "gender": gender,
+        "level": level
+    }
+    characters.append(new_char)
+    with open(CHARACTERS_FILE, "w") as f:
+        json.dump({"characters": characters}, f, indent=4)

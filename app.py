@@ -1,106 +1,127 @@
 import streamlit as st
-from story.generator import create_story, continue_story
-from story.characters import load_characters, add_character
 import time
 
-st.title("AI Story Generator")
+# ===== Imports projet =====
 
-# --- INITIALISATION SESSION STATE ---
-if "character_updated" not in st.session_state:
-    st.session_state["character_updated"] = False
+from story.library import get_random_story
+from story.characters import load_characters, add_character
+from story.generator import generate_story
+from ai.transformer_model import init_transformer
 
-if "stories" not in st.session_state:
-    st.session_state["stories"] = []  # Mémoire long terme pour continuer histoires
+# =========================
+# CONFIG
+# =========================
+st.set_page_config(page_title="AI Story Generator", layout="centered")
+st.title(" AI Story Generator")
 
-# --- NAVIGATION MODE ---
-mode = st.radio("Mode", ["New Story", "Continue Story"], key="mode_radio")
+# =========================
+# SESSION STATE INIT
+# =========================
+if "generated_stories" not in st.session_state:
+    st.session_state["generated_stories"] = []
 
-# --- CREER UN PERSONNAGE ---
-with st.expander("➕ Create new character"):
-    new_name = st.text_input("Name", key="new_name")
-    new_role = st.text_input("Role", key="new_role")
-    new_traits = st.text_area("Personality traits", key="new_traits")
+if "characters_updated" not in st.session_state:
+    st.session_state["characters_updated"] = False
 
-    if st.button("Save character", key="save_new_character"):
-        if new_name and new_role and new_traits:
-            add_character(new_name, new_role, new_traits)
-            st.success(f"Character '{new_name}' added successfully!")
-            st.session_state["character_updated"] = True
-        else:
-            st.warning("Please fill in all fields")
+if "last_story" not in st.session_state:
+    st.session_state["last_story"] = ""
 
-# --- CHARGER LES PERSONNAGES ---
+# =========================
+# LOAD CHARACTERS
+# =========================
 characters = load_characters()
 
-if st.session_state["character_updated"]:
-    characters = load_characters()
-    st.session_state["character_updated"] = False
+# =========================
+# INIT TRANSFORMER
+# =========================
+if "transformer_initialized" not in st.session_state:
+    all_stories = []
+    for length in ["short", "medium", "long"]:
+        for s in get_random_story.__globals__["load_stories"](length):
+            all_stories.append(s["text"])
+    init_transformer(all_stories)
+    st.session_state["transformer_initialized"] = True
 
-# --- SI PAS DE PERSONNAGE ---
-if not characters:
-    st.warning("No characters available. Please create one first.")
-else:
-    # --- SELECTION DU PERSONNAGE ---
-    character_names = [c["name"] for c in characters]
-    selected_name = st.selectbox(
-        "Choose a character",
-        character_names,
-        key="select_character_main"
-    )
-    character = next(c for c in characters if c["name"] == selected_name)
+# =========================
+# NAVIGATION
+# =========================
+menu = st.sidebar.radio("Menu", ["Generate Story", "Continue Story", "Create Character"])
 
-    # --- MODE NOUVELLE HISTOIRE ---
-    if mode == "New Story":
-        genre = st.selectbox("Genre", ["Sci-Fi", "Fantasy", "Horror"], key="genre_select")
-        tone = st.selectbox("Tone", ["Dark", "Serious", "Light"], key="tone_select")
-        length_option = st.selectbox(
-            "Story length",
-            ["Short", "Medium", "Long"],
-            key="length_select"
-        )
+# =========================
+# CREATE CHARACTER
+# =========================
+if menu == "Create Character":
+    st.header("➕ Create a New Character")
+    new_name = st.text_input("Name")
+    new_role = st.text_input("Role")
+    new_traits = st.text_area("Personality traits")
+    new_gender = st.radio("Gender", ["Male", "Female"])
+    new_level = st.selectbox("Writing level", ["Primary", "Secondary", "College"])
 
-        # Définir max_tokens selon la longueur
-        if length_option == "Short":
-            max_tokens = 200
-        elif length_option == "Medium":
-            max_tokens = 400
+    if st.button("Save character"):
+        if new_name and new_role and new_traits:
+            add_character(new_name, new_role, new_traits, new_gender, new_level)
+            st.success(f"Character '{new_name}' added successfully!")
+            st.session_state["characters_updated"] = True
+            st.experimental_rerun()
         else:
-            max_tokens = 600
+            st.warning("Please fill in all fields")
+    st.stop()
 
-        if st.button("Generate story", key="generate_story_btn"):
-            start = time.time()
-            with st.spinner(f"Generating {length_option} story…"):
-                story = create_story(
-                    {"genre": genre, "tone": tone},
-                    character,
-                    max_tokens=max_tokens
-                )
-            end = time.time()
-            st.success(f"Story generated in {end-start:.2f} seconds ✅")
-            st.write(story)
+# =========================
+# SELECT CHARACTER
+# =========================
+st.subheader("Character Selection")
+character_names = [c["name"] for c in characters]
+selected_name = st.selectbox("Choose a character", character_names)
+character = next(c for c in characters if c["name"] == selected_name)
 
-            # Ajouter à la mémoire long terme
-            st.session_state["stories"].append(story)
+# =========================
+# GENERATE STORY
+# =========================
+if menu == "Generate Story":
+    st.header("Generate a New Story")
 
-            # Affichage du score de cohérence (exemple simple)
-            st.info(f"Story coherence score: {round(0.7 + 0.3 * st.session_state['stories'].count(story)/len(st.session_state['stories']),2)}")
+    # Settings
+    length = st.selectbox("Story length", ["short", "medium", "long"])
+    genre = st.selectbox("Genre", ["Sci-Fi", "Fantasy", "Horror"])
+    theme = st.selectbox("Theme", ["Adventure", "Mystery", "Romance", "Thriller"])
+    gender = st.radio("Main character gender", ["Male", "Female"])
+    level = st.selectbox("Writing level", ["Primary", "Secondary", "College"])
 
-    # --- MODE CONTINUER HISTOIRE ---
-    elif mode == "Continue Story":
-        previous_story = st.text_area("Paste your existing story here", key="prev_story")
-        if st.button("Continue story", key="continue_story_btn"):
-            if previous_story.strip() == "":
-                st.warning("Please provide an existing story to continue.")
-            else:
-                start = time.time()
-                with st.spinner("Continuing the story…"):
-                    continuation = continue_story(previous_story, character)
-                end = time.time()
-                st.success(f"Story continued in {end-start:.2f} seconds ✅")
-                st.write(continuation)
+    token_map = {"short": 200, "medium": 350, "long": 500}
+    max_tokens = token_map[length]
 
-                # Ajouter à la mémoire long terme
-                st.session_state["stories"].append(continuation)
+    if st.button("Generate story"):
+        with st.spinner("Generating story..."):
+            attempts = 0
+            while True:
+                base_story = get_random_story(length, genre, theme, gender, level)
+                if base_story["text"] not in st.session_state["generated_stories"]:
+                    break
+                attempts += 1
+                if attempts > 10:
+                    break
 
-                # Affichage du score de cohérence
-                st.info(f"Story coherence score: {round(0.7 + 0.3 * st.session_state['stories'].count(continuation)/len(st.session_state['stories']),2)}")
+            final_story = generate_story(base_story, character, max_tokens=max_tokens)
+            st.session_state["generated_stories"].append(base_story["text"])
+            st.session_state["last_story"] = final_story
+
+        st.success("Story generated ✅")
+        st.markdown(f"**Genre:** {genre} | **Theme:** {theme} | **Level:** {level}")
+        st.write(final_story)
+
+# =========================
+# CONTINUE STORY
+# =========================
+if menu == "Continue Story":
+    st.header("Continue Your Last Story")
+    if not st.session_state["last_story"]:
+        st.info("No story available. Please generate a story first.")
+    else:
+        if st.button("Continue story"):
+            with st.spinner("Continuing story..."):
+                continued = generate_story(st.session_state["last_story"], character, max_tokens=300)
+            st.session_state["last_story"] = continued
+            st.markdown(f"**Character:** {character['name']} | **Level:** {character['level']}")
+            st.write(continued)

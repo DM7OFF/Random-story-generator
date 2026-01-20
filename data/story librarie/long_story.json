@@ -1,0 +1,28 @@
+{
+  "stories": [
+    {
+      "text": "Mister, a logical scientist, discovers a glowing machine in the lab.",
+      "length": "short",
+      "genre": "Sci-Fi",
+      "theme": "Adventure",
+      "gender": "Male",
+      "level": "Primary"
+    },
+    {
+      "text": "Luna, a curious adventurer, opens a mysterious box and finds a tiny dragon.",
+      "length": "short",
+      "genre": "Fantasy",
+      "theme": "Mystery",
+      "gender": "Female",
+      "level": "Primary"
+    },
+    {
+      "text": "In the city of Arcadia, Mister, a precise scientist, works on a revolutionary device. Unexpected events test his logic, forcing him to make moral choices.",
+      "length": "long",
+      "genre": "Sci-Fi",
+      "theme": "Thriller",
+      "gender": "Male",
+      "level": "Primary"
+    }
+  ]
+}
