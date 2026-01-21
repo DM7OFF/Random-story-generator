@@ -1,57 +1,56 @@
-import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
+import torch
 
 # =========================
 # MINI TRANSFORMER
 # =========================
-
 class MiniTransformer:
     def __init__(self, model_name="distilgpt2"):
+        # Charge tokenizer et modèle
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
-
         self.model = AutoModelForCausalLM.from_pretrained(
             model_name,
-            torch_dtype=torch.float32
+            torch_dtype=torch.float32  # force float32
         )
-
+        
+        # Ajoute un token PAD si absent
         if self.tokenizer.pad_token is None:
             self.tokenizer.pad_token = self.tokenizer.eos_token
 
     def rewrite(self, story: str, character: dict) -> str:
-        context = (
-            f"{character['name']} is a {character['role']}. "
-            f"Personality: {character['traits']}. "
-            f"Writing level: {character['level']}.\n\n"
+        # Prefixe structurel avec infos du personnage
+        prefix = f"{character['name']} is a {character['role']}. {character['traits']}. "
+        full_input = prefix + "\n" + story
+
+        # Tokenize
+        inputs = self.tokenizer(
+            full_input,
+            return_tensors="pt",
+            truncation=True,
+            max_length=512
         )
 
-        full_input = context + story
-
-        inputs = self.tokenizer(
-    full_input,
-    return_tensors="pt",
-    truncation=True,
-    max_length=512
-)
-
-
+        # Génération
         with torch.no_grad():
-            outputs = self.model.generate(
-        input_ids=inputs["input_ids"],
-        attention_mask=inputs["attention_mask"],
-        max_new_tokens=180,
-        do_sample=True,
-        temperature=0.85,
-        top_p=0.92
-    )
+            output_ids = self.model.generate(
+                input_ids=inputs["input_ids"],
+                attention_mask=inputs["attention_mask"],
+                max_new_tokens=180,
+                temperature=0.85,
+                top_p=0.92,
+                do_sample=True
+            )
 
-        generated = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
+        # Décodage
+        generated = self.tokenizer.decode(output_ids[0], skip_special_tokens=True)
+
+        # On enlève le texte d’entrée pour garder uniquement la réécriture
         return generated[len(full_input):].strip()
 
 
 # =========================
 # INSTANCE GLOBALE
 # =========================
-
 _transformer = None
 
 def init_transformer():

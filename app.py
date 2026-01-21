@@ -5,7 +5,7 @@ import time
 from story.library import get_random_story, load_stories
 from story.characters import load_characters, add_character
 from story.generator import generate_story
-from ai.transformer_model import init_transformer
+from ai.transformer_model import init_transformer, rewrite_story
 
 
 # =========================
