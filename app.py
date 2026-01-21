@@ -131,7 +131,7 @@ elif menu == "Continue Story":
     else:
         if st.button("Continue story"):
             with st.spinner("Continuing story..."):
-                continued = generate_story(st.session_state["last_story"], character, max_tokens=300)
+                continued = generate_story(st.session_state["last_story"], character)
 
             st.session_state["last_story"] = continued
             st.markdown(f"**Character:** {character['name']} | **Level:** {character['level']}")
