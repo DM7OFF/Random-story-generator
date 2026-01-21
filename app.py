@@ -7,6 +7,13 @@ from story.characters import load_characters, add_character
 from story.generator import generate_story
 from ai.transformer_model import init_transformer
 
+
+# =========================
+# INIT IA (UNE SEULE FOIS)
+# =========================
+init_transformer()
+
+
 # =========================
 # CONFIG
 # =========================
@@ -27,6 +34,10 @@ if "last_story" not in st.session_state:
 
 if "transformer_initialized" not in st.session_state:
     st.session_state["transformer_initialized"] = False
+
+if "ai_initialized" not in st.session_state:
+    init_transformer()
+    st.session_state.ai_initialized = True
 
 # =========================
 # LOAD CHARACTERS
