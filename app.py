@@ -64,7 +64,7 @@ if st.button("Save character"):
         add_character(new_name, new_role, new_traits, new_gender, new_level)
         st.success(f"Character '{new_name}' added successfully!")
         st.session_state["characters_updated"] = True
-        st.experimental_rerun()  # Relance l'app pour mettre à jour la liste des personnages
+        st.rerun()  # Relance l'app pour mettre à jour la liste des personnages
     else:
         st.warning("Please fill in all fields")
 
